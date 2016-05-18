@@ -1,0 +1,27 @@
+{
+  "name": "corephp/core",
+  "type": "library",
+  "description": "Nucleo del proyecto CorePHP",
+  "keywords": ["scripts","php","database"],
+  "homepage": "https://github.com/danteay/CorePHPCore",
+  "license": "GNU-3",
+  "authors": [
+    {
+      "name": "Eduardo Aguilar",
+      "email": "eduardo.aguilar41@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6"
+  },
+  "require-dev":{
+    "phpunit/phpunit": ">=5.3",
+    "phpunit/php-invoker": "1.1.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "CorePHPCore\\": ""
+    }
+  }
+
+}
