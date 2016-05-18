@@ -23,9 +23,10 @@ abstract class Conexion
     /**
      * Funcion donde se inicalizara la conexion
      *
+     * @param array $config
      * @return mixed
      */
-    protected abstract function __init__();
+    public abstract function __init__(array $config = array());
 
     /**
      * Obtiene el query actualmente cargado
@@ -113,5 +114,37 @@ abstract class Conexion
         }
 
         return $res;
+    }
+
+    /**
+     * Valida la existencia de los campos requeridos para la configuracion de la conexion
+     *
+     * @param array $config
+     * @throws ConexionException
+     */
+    public static function validateConfig(array $config)
+    {
+        $verify = ['host','port','dbas','user','pass'];
+        foreach ($verify as $value){
+            if(!array_key_exists($value,$config)){
+                throw new ConexionException("Config is not valid");
+            }
+        }
+    }
+
+    /**
+     * Codigo a ejecutarse cuando este objeto sea clonado
+     */
+    public function __clone()
+    {
+        throw new ConexionException("This instance can't be cloned");
+    }
+
+    /**
+     * Cotigo a ejecutarse cuando este objeto sea serializado
+     */
+    public function __wakeup()
+    {
+        throw new ConexionException("This instance can't be serialize");
     }
 }

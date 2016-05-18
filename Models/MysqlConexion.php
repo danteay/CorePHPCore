@@ -17,9 +17,7 @@ class MysqlConexion extends Conexion
      */
     public function __construct(MysqlConexion $conx = null)
     {
-        if(empty($conx)){
-            $this->__init__();
-        }else{
+        if(!empty($conx)){
             $this->conx = $conx;
         }
     }
@@ -27,16 +25,25 @@ class MysqlConexion extends Conexion
     /**
      * Funcion donde se inicalizara la conexion
      *
+     * @param array $config
      * @return mixed
      */
-    protected function __init__()
+    public function __init__(array $config = array())
     {
-        $this->engine = "mysql";
-        $this->port   = "3306";
-        $this->host   = ":host:";
-        $this->dbas   = ":dbas:";
-        $this->user   = ":user:";
-        $this->pass   = ":pass:";
+        if(!empty($config)){
+            parent::validateConfig($config);
+
+            foreach ($config as $key => $value){
+                $this->$key = $value;
+            }
+        }else{
+            $this->engine = "mysql";
+            $this->port   = "3306";
+            $this->host   = ":host:";
+            $this->dbas   = ":dbas:";
+            $this->user   = ":user:";
+            $this->pass   = ":pass:";
+        }
 
         $dns = "{$this->engine}:host={$this->host};port={$this->port};dbname={$this->dbas}";
 
