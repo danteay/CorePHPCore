@@ -23,12 +23,12 @@ trait ConexionConfig
     public static function getConfig()
     {
         return array(
-            'engine' => 'mysql',
-            'host' => 'localhost',
-            'port' => '3306',
-            'user' => 'root',
-            'pass' => 'root',
-            'dbas' => 'Lucio'
+            'engine' => ':engine:',
+            'host' => ':host:',
+            'port' => ':port:',
+            'user' => ':user:',
+            'pass' => ':pass:',
+            'dbas' => ':dbas:'
         );
     }
 
