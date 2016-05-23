@@ -6,16 +6,12 @@
 namespace CorePHPCore\Abs;
 
 use CorePHPCore\Exceptions\ConexionException;
+use CorePHPCore\Libs\ConexionConfig;
 
 abstract class Conexion
 {
-    protected $host;
-    protected $port;
-    protected $dbas;
-    protected $user;
-    protected $pass;
-    protected $engine;
-
+    use ConexionConfig;
+    
     public $conx;
 
     protected $query;
@@ -61,21 +57,8 @@ abstract class Conexion
      * @return bool
      * @throws ConexionException
      */
-    public function setRequest()
-    {
-        try{
-            $this->conx->query($this->query);
-            $erros = $this->conx->errorInfo();
-
-            if(empty($erros[2])){
-                return true;
-            }else{
-                throw new ConexionException($erros[2]);
-            }
-        }catch (\Exception $e){
-            throw new ConexionException($e->getMessage());
-        }
-    }
+    public abstract function setRequest();
+    
 
     /**
      * Ejecuta un query que regresa informacion (Select, Describe ...)
@@ -83,21 +66,8 @@ abstract class Conexion
      * @return array
      * @throws ConexionException
      */
-    public function getRequest()
-    {
-        try{
-            $data = $this->conx->query($this->query);
-            $erros = $this->conx->errorInfo();
+    public abstract function getRequest();
 
-            if(empty($erros[2])){
-                return self::normalizeData($data);
-            }else{
-                throw new ConexionException($erros[2]);
-            }
-        }catch (\Exception $e){
-            throw new ConexionException($e->getMessage());
-        }
-    }
 
     /**
      * Regresa un arreglo de objetos con la informacion de una consulta ejecutada
@@ -105,32 +75,8 @@ abstract class Conexion
      * @param $data
      * @return array
      */
-    protected static function normalizeData($data)
-    {
-        $res = array();
-
-        while($fila = $data->fetch(PDO::FETCH_OBJ)){
-            $res[] = $fila;
-        }
-
-        return $res;
-    }
-
-    /**
-     * Valida la existencia de los campos requeridos para la configuracion de la conexion
-     *
-     * @param array $config
-     * @throws ConexionException
-     */
-    public static function validateConfig(array $config)
-    {
-        $verify = ['host','port','dbas','user','pass'];
-        foreach ($verify as $value){
-            if(!array_key_exists($value,$config)){
-                throw new ConexionException("Config is not valid");
-            }
-        }
-    }
+    protected static abstract function normalizeData($data);
+    
 
     /**
      * Codigo a ejecutarse cuando este objeto sea clonado
