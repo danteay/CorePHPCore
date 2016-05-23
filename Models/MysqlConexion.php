@@ -87,12 +87,12 @@ class MysqlConexion extends Conexion
      */
     protected static function normalizeData($data)
     {
-        $final = array();
+        $array = array();
 
         while($fila = $data->fetch_object()){
-            $final[] = $fila;
+            $array[] = $fila;
         }
 
-        return $fila;
+        return $array;
     }
 }

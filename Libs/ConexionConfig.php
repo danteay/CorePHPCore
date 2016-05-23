@@ -61,7 +61,7 @@ trait ConexionConfig
      * @throws ConexionException
      * @return boolean
      */
-    public function validateConfig(array $config)
+    public function validateConfig(array &$config)
     {
         $validFields = self::validFields();
         $validEngine = self::supportedEngines();
