@@ -6,16 +6,12 @@
 namespace CorePHPCore\Abs;
 
 use CorePHPCore\Exceptions\ConexionException;
+use CorePHPCore\Libs\ConexionConfig;
 
 abstract class Conexion
 {
-    protected $host;
-    protected $port;
-    protected $dbas;
-    protected $user;
-    protected $pass;
-    protected $engine;
-
+    use ConexionConfig;
+    
     public $conx;
 
     protected $query;
@@ -23,9 +19,10 @@ abstract class Conexion
     /**
      * Funcion donde se inicalizara la conexion
      *
+     * @param array $config
      * @return mixed
      */
-    protected abstract function __init__();
+    public abstract function __init__(array $config = array());
 
     /**
      * Obtiene el query actualmente cargado
@@ -60,21 +57,8 @@ abstract class Conexion
      * @return bool
      * @throws ConexionException
      */
-    public function setRequest()
-    {
-        try{
-            $this->conx->query($this->query);
-            $erros = $this->conx->errorInfo();
-
-            if(empty($erros[2])){
-                return true;
-            }else{
-                throw new ConexionException($erros[2]);
-            }
-        }catch (\Exception $e){
-            throw new ConexionException($e->getMessage());
-        }
-    }
+    public abstract function setRequest();
+    
 
     /**
      * Ejecuta un query que regresa informacion (Select, Describe ...)
@@ -82,21 +66,8 @@ abstract class Conexion
      * @return array
      * @throws ConexionException
      */
-    public function getRequest()
-    {
-        try{
-            $data = $this->conx->query($this->query);
-            $erros = $this->conx->errorInfo();
+    public abstract function getRequest();
 
-            if(empty($erros[2])){
-                return self::normalizeData($data);
-            }else{
-                throw new ConexionException($erros[2]);
-            }
-        }catch (\Exception $e){
-            throw new ConexionException($e->getMessage());
-        }
-    }
 
     /**
      * Regresa un arreglo de objetos con la informacion de una consulta ejecutada
@@ -104,14 +75,22 @@ abstract class Conexion
      * @param $data
      * @return array
      */
-    protected static function normalizeData($data)
+    protected static abstract function normalizeData($data);
+    
+
+    /**
+     * Codigo a ejecutarse cuando este objeto sea clonado
+     */
+    public function __clone()
     {
-        $res = array();
+        throw new ConexionException("This instance can't be cloned");
+    }
 
-        while($fila = $data->fetch(PDO::FETCH_OBJ)){
-            $res[] = $fila;
-        }
-
-        return $res;
+    /**
+     * Cotigo a ejecutarse cuando este objeto sea serializado
+     */
+    public function __wakeup()
+    {
+        throw new ConexionException("This instance can't be serialize");
     }
 }

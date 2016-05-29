@@ -7,39 +7,92 @@ namespace CorePHPCore\Models;
 
 
 use CorePHPCore\Abs\Conexion;
+use CorePHPCore\Exceptions\ConexionException;
 
 class MysqlConexion extends Conexion
 {
     /**
-     * Constrcutor de la conexion
+     * MysqlConexion constructor.
      *
      * @param MysqlConexion|null $conx
      */
     public function __construct(MysqlConexion $conx = null)
     {
-        if(empty($conx)){
-            $this->__init__();
-        }else{
+        if(!empty($conx))
             $this->conx = $conx;
-        }
     }
 
     /**
      * Funcion donde se inicalizara la conexion
      *
+     * @param array $config
+     * @throws ConexionException
      * @return mixed
      */
-    protected function __init__()
+    public function __init__(array $config = array())
     {
-        $this->engine = "mysql";
-        $this->port   = "3306";
-        $this->host   = ":host:";
-        $this->dbas   = ":dbas:";
-        $this->user   = ":user:";
-        $this->pass   = ":pass:";
+        $conf = self::getConfig();
 
-        $dns = "{$this->engine}:host={$this->host};port={$this->port};dbname={$this->dbas}";
+        if(!empty($config)) {
+            if($this->validateConfig($config)){
+                $conf = $config;
+            }
+        }
 
-        $this->conx = new \PDO($dns,$this->user,$this->pass);
+        $this->conx = new \mysqli($conf['host'], $conf['user'], $conf['pass'], $conf['dbas'], $conf['port']);
+
+        if ($this->conx->connect_errno) {
+            throw new ConexionException("Fail connect to MySQL: (" . $this->conx->connect_errno . ") " . $this->conx->connect_error);
+        }
+    }
+
+    /**
+     * Envia ejecuta un query que no retorna resultado (Insert, Update, Delete ...)
+     *
+     * @return bool
+     * @throws ConexionException
+     */
+    public function setRequest()
+    {
+        $this->conx->query($this->query);
+
+        if(empty($this->conx->error)){
+            return true;
+        }else{
+            throw new ConexionException("<b>Error:</b> ".$this->conx->error);
+        }
+    }
+
+    /**
+     * Ejecuta un query que regresa informacion (Select, Describe ...)
+     *
+     * @return array
+     * @throws ConexionException
+     */
+    public function getRequest()
+    {
+        $data = $this->conx->query($this->query);
+        if(empty($this->conx->error)){
+            return self::normalizeData($data);
+        }else{
+            throw new ConexionException("<b>Error:</b> ".$this->conx->error);
+        }
+    }
+
+    /**
+     * Regresa un arreglo de objetos con la informacion de una consulta ejecutada
+     *
+     * @param $data
+     * @return array
+     */
+    protected static function normalizeData($data)
+    {
+        $array = array();
+
+        while($fila = $data->fetch_object()){
+            $array[] = $fila;
+        }
+
+        return $array;
     }
 }
